@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Калькулятор погрешности по метизам</title>
+  <meta name="description" content="Пропорции для акта расхождения: 50 г на 1 кг, 12 штук на 100, 30 рублей на строку." />
+  <meta name="theme-color" content="#4208A8" />
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root {
+      --violet: #4208A8;
+      --gray: #CCCCCC;
+      --white: #ffffff;
+      --ink: #111111;
+      --font: Arial, Helvetica, sans-serif;
+      --head: "Arial Black", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.45;
+    }
+    header.top {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 18px 20px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+    .logo {
+      width: 280px;
+      min-width: 250px;
+      height: auto;
+      display: block;
+    }
+    header h1 {
+      margin: 0;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      color: var(--violet);
+      line-height: 1.15;
+    }
+    header .sub {
+      margin: 2px 0 0;
+      font-weight: 700;
+    }
+    .date {
+      border: 1px solid var(--gray);
+      border-radius: 999px;
+      padding: 8px 14px;
+      text-align: right;
+      color: var(--violet);
+      white-space: nowrap;
+    }
+    .date span {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .date time {
+      font-family: var(--head);
+      font-weight: 800;
+    }
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 8px 20px 56px;
+    }
+    .hero {
+      margin: 8px 0 22px;
+      padding: 26px 28px 28px;
+      border-radius: 20px;
+      background: var(--violet);
+      color: var(--white);
+    }
+    .kicker {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .motto {
+      margin: 0 0 10px;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4.4vw, 2.6rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .hero p { margin: 0; max-width: 68ch; color: var(--white); }
+    h2 {
+      margin: 28px 0 8px;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+      letter-spacing: -0.03em;
+      color: var(--violet);
+    }
+    .lead { margin: 0 0 14px; max-width: 70ch; }
+    .props {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .prop {
+      border: 1px solid var(--gray);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      background: var(--white);
+    }
+    .prop .kicker { color: var(--violet); letter-spacing: 0.08em; }
+    .eq {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 4px 0 8px;
+      font-family: var(--head);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--violet);
+      font-size: clamp(1.7rem, 3vw, 2.15rem);
+      line-height: 1.05;
+    }
+    .eq span {
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    .prop p { margin: 0; }
+    .share {
+      margin-top: 12px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--gray);
+      overflow: hidden;
+    }
+    .share i {
+      display: block;
+      height: 100%;
+      background: var(--violet);
+    }
+    .calc {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 8px;
+    }
+    form, .result {
+      border: 1px solid var(--gray);
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--white);
+    }
+    .seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 14px;
+      background: var(--gray);
+    }
+    .seg button, .chips button, .copy {
+      font: inherit;
+      cursor: pointer;
+    }
+    .seg button {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 8px;
+      background: transparent;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .seg button[aria-pressed="true"] {
+      background: var(--white);
+      color: var(--violet);
+    }
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: 700;
+    }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--gray);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 1.05rem;
+      color: var(--ink);
+      background: var(--white);
+    }
+    input:focus, button:focus-visible {
+      outline: 2px solid var(--violet);
+      outline-offset: 2px;
+    }
+    .hint {
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--white);
+      border: 1px solid var(--gray);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chips button, .copy {
+      border: 1px solid var(--violet);
+      background: var(--white);
+      color: var(--violet);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-weight: 700;
+    }
+    .result {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+    .result.go {
+      background: var(--violet);
+      color: var(--white);
+      border-color: var(--violet);
+    }
+    .result .big {
+      margin: 0 0 8px;
+      font-family: var(--head);
+      font-weight: 800;
+      font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .result p { margin: 0 0 8px; }
+    .meter { margin: 4px 0 12px; }
+    .meter .cap {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+    .track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--gray);
+      overflow: hidden;
+    }
+    .result.go .track { background: rgba(255, 255, 255, 0.28); }
+    .track b {
+      display: block;
+      height: 100%;
+      background: var(--violet);
+      border-radius: inherit;
+    }
+    .result.go .track b { background: var(--white); }
+    .comment {
+      margin-top: auto;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid var(--gray);
+    }
+    .result.go .comment {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      border: 0;
+    }
+    .copy { margin-top: 10px; align-self: flex-start; }
+    .result.go .copy {
+      background: var(--white);
+      color: var(--violet);
+      border-color: var(--white);
+    }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--gray);
+      vertical-align: top;
+    }
+    th {
+      color: var(--violet);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    td.num { font-weight: 700; color: var(--violet); white-space: nowrap; }
+    .stops {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stops article {
+      border: 1px solid var(--gray);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+    .stops h3 {
+      margin: 0 0 6px;
+      font-size: 1.02rem;
+      color: var(--violet);
+    }
+    .stops p { margin: 0; }
+    footer {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 8px 20px 28px;
+      color: var(--ink);
+    }
+    footer p { margin: 0; }
+    @media (max-width: 800px) {
+      header.top, .props, .calc, .row2, .stops { display: block; }
+      header.top .date { display: inline-block; margin-top: 12px; }
+      .prop, .calc form, .calc .result, .stops article { margin-top: 12px; }
+      .logo { width: 250px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="index.html">
+      <img class="logo" src="assets/logo.png" alt="У Михалыча" width="280" height="36" />
+      <span>
+        <h1>Академия УМ</h1>
+        <p class="sub">Калькулятор приёмки</p>
+      </span>
+    </a>
+    <div class="date">
+      <span>Действует с</span>
+      <time datetime="2026-10-30">30 октября 2026</time>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="kicker">Акт о расхождении</p>
+      <p class="motto">Делаем мир крепче</p>
+      <p>Мелкую недостачу по метизам магазин закрывает сам, если сошлись три пропорции. Так мы отделяем сбой весов и пересчёта от настоящей недостачи. Треть мешка на магазин не списываем, даже если по деньгам вышло мало.</p>
+    </section>
+
+    <h2>Три пропорции</h2>
+    <p class="lead">Смотрим одну строку. Вес и штуки считаем от количества в документе. Потолок по деньгам один на строку, он с килограммами не растёт. Нужны все три ответа «да».</p>
+    <div class="props">
+      <article class="prop">
+        <p class="kicker">Вес · 5 из 100</p>
+        <p class="eq">50 г <span>на</span> 1 кг</p>
+        <p>0,5 кг → 25 г. 2 кг → 100 г. 5 кг → 250 г.</p>
+        <div class="share" title="5% от количества по документу"><i style="width:5%"></i></div>
+      </article>
+      <article class="prop">
+        <p class="kicker">Штуки · 12 из 100</p>
+        <p class="eq">12 шт <span>на</span> 100 шт</p>
+        <p>Дробь вверх не берём. На 28 штук 12% — это 3,36, целиком можно 3. На 8 штук доля меньше одной штуки, целую штуку не закрываем.</p>
+        <div class="share" title="12% от количества по документу"><i style="width:12%"></i></div>
+      </article>
+      <article class="prop">
+        <p class="kicker">Деньги · потолок строки</p>
+        <p class="eq">30 ₽ <span>на</span> 1 строку</p>
+        <p>30 ₽ ещё можно. 30,01 ₽ уже нет. Минус в акте не смотрим. Строки между собой не складываем. Десять килограммов не дают потолок 300 ₽.</p>
+      </article>
+    </div>
+
+    <h2>Посчитать строку</h2>
+    <p class="lead">Подставьте количество из акта и сумму из колонки «Сумма». Факт пишите как пересчитали, строку под документ не подгоняйте.</p>
+    <div class="calc">
+      <form id="calc">
+        <div class="seg" role="radiogroup" aria-label="Это метизка?">
+          <button type="button" id="metiz-yes" aria-pressed="true">Метизка</button>
+          <button type="button" id="metiz-no" aria-pressed="false">Не метизка</button>
+        </div>
+        <label for="unit">В чём количество в акте</label>
+        <div class="seg" id="unit" role="radiogroup" aria-label="Единица количества">
+          <button type="button" data-unit="kg" aria-pressed="true">Килограммы</button>
+          <button type="button" data-unit="pcs" aria-pressed="false">Штуки</button>
+        </div>
+        <div class="row2">
+          <div>
+            <label for="doc">По документу</label>
+            <input id="doc" type="text" inputmode="decimal" placeholder="1 или 300" autocomplete="off" />
+          </div>
+          <div>
+            <label for="fact">Факт</label>
+            <input id="fact" type="text" inputmode="decimal" placeholder="0,976 или 265" autocomplete="off" />
+          </div>
+        </div>
+        <label for="sum">Сумма строки, ₽</label>
+        <input id="sum" type="text" inputmode="decimal" placeholder="до 30" autocomplete="off" />
+        <p class="hint" id="hint">Впишите количество по документу. Здесь появится пропорция именно на него.</p>
+        <div class="chips" aria-label="Примеры">
+          <button type="button" data-ex="kg|1|0,976|4,20|1">1 кг → 0,976</button>
+          <button type="button" data-ex="kg|1|0,700|18|1">1 кг → 0,700</button>
+          <button type="button" data-ex="pcs|300|265|12|1">300 шт → 265</button>
+          <button type="button" data-ex="pcs|28|21|29,12|1">28 шт → 21</button>
+          <button type="button" data-ex="kg|0,5|0,43|8,42|1">0,5 кг → 0,43</button>
+          <button type="button" data-ex="pcs|2|1|25|0">Не метизка</button>
+        </div>
+      </form>
+      <div class="result" id="result" aria-live="polite">
+        <p class="big">Здесь будет решение</p>
+        <p>Калькулятор сравнит недобор с пропорцией и сумму с 30 ₽.</p>
+      </div>
+    </div>
+
+    <h2>Готовые пропорции</h2>
+    <p class="lead">Если делить некогда, найдите ближайшее количество. Выше этой цифры процент уже больше допуска.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Выписали</th>
+            <th>Можно не добрать</th>
+            <th>Как получилось</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0,5 кг</td><td class="num">25 г</td><td>0,5 × 50 г</td></tr>
+          <tr><td>1 кг</td><td class="num">50 г</td><td>1 × 50 г</td></tr>
+          <tr><td>2 кг</td><td class="num">100 г</td><td>2 × 50 г</td></tr>
+          <tr><td>5 кг</td><td class="num">250 г</td><td>5 × 50 г</td></tr>
+          <tr><td>8 шт</td><td class="num">0 шт</td><td>12% меньше одной штуки. Целую штуку не закрываем.</td></tr>
+          <tr><td>28 шт</td><td class="num">3 шт</td><td>12% от 28 = 3,36. Целиком берём 3. Четвёртая уже 14%.</td></tr>
+          <tr><td>50 шт</td><td class="num">6 шт</td><td>50 × 12 ÷ 100</td></tr>
+          <tr><td>100 шт</td><td class="num">12 шт</td><td>12 на каждые 100</td></tr>
+          <tr><td>300 шт</td><td class="num">36 шт</td><td>300 × 12 ÷ 100. 36 штук — это ровно 12%, ещё можно.</td></tr>
+          <tr><td>312 шт</td><td class="num">37 шт</td><td>12% от 312 = 37,44. Целиком 37.</td></tr>
+          <tr><td>Любая строка</td><td class="num">30 ₽</td><td>Потолок один. С количеством не растёт.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Что калькулятор не закрывает</h2>
+    <div class="stops">
+      <article>
+        <h3>Не метизка</h3>
+        <p>Клей, герметик, щётка, инструмент. Даже одна штука и даже сумма до 30 ₽. Это обычная недостача.</p>
+      </article>
+      <article>
+        <h3>Излишек</h3>
+        <p>Если приехало больше, чем в документе, лишнее так и пишем в акте. На погрешность это не списываем.</p>
+      </article>
+      <article>
+        <h3>Находка не в день машины</h3>
+        <p>Пропорция для акта в день приёмки. Недостачу, которую нашли позже на полке, так не закрываем.</p>
+      </article>
+      <article>
+        <h3>Соседние строки</h3>
+        <p>Каждая строка живёт сама. Пять годных магазин закрывает. Одна с большим процентом остаётся недостачей.</p>
+      </article>
+    </div>
+  </main>
+  <footer>
+    <p>У Михалыча · Делаем мир крепче</p>
+  </footer>
+  <script src="calc.js"></script>
+  <script>
+    (function () {
+      var calc = window.MetizCalc;
+      var docEl = document.getElementById("doc");
+      var factEl = document.getElementById("fact");
+      var sumEl = document.getElementById("sum");
+      var hint = document.getElementById("hint");
+      var result = document.getElementById("result");
+      var unit = "kg";
+      var metiz = true;
+
+      function parseNum(value) {
+        var clean = String(value || "").replace(/\s/g, "").replace(",", ".");
+        if (clean === "" || clean === "-" || clean === "+") return null;
+        var n = Number(clean);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function fmt(n, digits) {
+        return n.toLocaleString("ru-RU", {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits
+        });
+      }
+
+      function fmtQty(n) {
+        return n.toLocaleString("ru-RU", { maximumFractionDigits: 3 });
+      }
+
+      function fmtSmart(n) {
+        var rounded = Math.round(n * 10) / 10;
+        var digits = Math.abs(rounded - Math.round(rounded)) < 0.001 ? 0 : 1;
+        return fmt(rounded, digits);
+      }
+
+      function fmtPct(pct) {
+        var rounded = Math.round(pct * 10) / 10;
+        var digits = Math.abs(rounded - Math.round(rounded)) < 0.001 ? 0 : 1;
+        return fmt(rounded, digits);
+      }
+
+      function massFromGrams(g) {
+        if (g >= 1000) return fmtQty(g / 1000) + " кг";
+        return fmtSmart(g) + " г";
+      }
+
+      function piecesWord(n) {
+        return fmtQty(n) + " шт";
+      }
+
+      function escapeHtml(text) {
+        return String(text)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function proportionSentence(docN) {
+        if (unit === "kg") {
+          return "На " + fmtQty(docN) + " кг можно не добрать до " + massFromGrams(docN * 50) + ".";
+        }
+        var whole = calc.maxWholePieces(docN);
+        var exact = docN * 12 / 100;
+        var base = "На " + fmtQty(docN) + " шт можно не добрать до " + piecesWord(whole) + ".";
+        if (whole === 0) {
+          return "На " + piecesWord(docN) + " 12% меньше одной штуки. Целую штуку магазин не закрывает.";
+        }
+        if (Math.abs(exact - whole) > 0.05) {
+          return base + " 12% здесь " + fmtSmart(exact) + ", целиком берём " + fmtQty(whole) + ".";
+        }
+        return base;
+      }
+
+      function meter(label, usedText, capText, ratio) {
+        var width = Math.max(0, Math.min(100, ratio * 100));
+        return '<div class="meter"><div class="cap"><span>' + label + "</span><span>" +
+          usedText + " из " + capText + '</span></div><div class="track"><b style="width:' +
+          width.toFixed(1) + '%"></b></div></div>';
+      }
+
+      function paint(state, body, comment) {
+        result.className = "result" + (state ? " " + state : "");
+        var html = body;
+        if (comment) {
+          html += '<div class="comment">' + escapeHtml(comment) + "</div>";
+          html += '<button type="button" class="copy">Скопировать комментарий</button>';
+        }
+        result.innerHTML = html;
+        var btn = result.querySelector(".copy");
+        if (btn) {
+          btn.addEventListener("click", function () {
+            var done = function () { btn.textContent = "Скопировано"; };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(comment).then(done, function () { fallbackCopy(comment, btn); });
+            } else {
+              fallbackCopy(comment, btn);
+            }
+          });
+        }
+      }
+
+      function fallbackCopy(text, btn) {
+        var area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        try {
+          document.execCommand("copy");
+          btn.textContent = "Скопировано";
+        } catch (e) {
+          btn.textContent = "Выделите текст комментария";
+        }
+        document.body.removeChild(area);
+      }
+
+      function recount() {
+        var docN = parseNum(docEl.value);
+        hint.textContent = docN > 0
+          ? proportionSentence(docN)
+          : "Впишите количество по документу. Здесь появится пропорция именно на него.";
+
+        var factN = parseNum(factEl.value);
+        var sumN = parseNum(sumEl.value);
+        if (docN === null || factN === null || sumN === null) {
+          paint("", "<p class=\"big\">Здесь будет решение</p><p>Нужны три числа: по документу, факт и сумма строки.</p>");
+          return;
+        }
+
+        var answer = calc.decide({ unit: unit, doc: docN, fact: factN, sum: sumN, metiz: metiz });
+        if (answer.status === "bad") {
+          paint("stop", "<p class=\"big\">Проверьте числа</p><p>По документу нужно число больше нуля. Факт не бывает меньше нуля.</p>");
+          return;
+        }
+        if (answer.status === "not-metiz") {
+          paint("stop", "<p class=\"big\">Это не метизка</p><p>Пропорции 50 г, 12 штук и 30 ₽ к этой строке не применяем. Нет банки, щётки или тубы — обычная недостача.</p>",
+            "Не метизка. Пропорцию погрешности не применяем. Обычная недостача.");
+          return;
+        }
+        if (answer.status === "extra") {
+          paint("stop", "<p class=\"big\">Это излишек</p><p>По факту больше на " + fmtQty(answer.extra) + ". Лишнее как погрешность не списываем. В акте оставляем факт.</p>",
+            "Излишек " + fmtQty(answer.extra) + ". Как погрешность не списываем.");
+          return;
+        }
+        if (answer.status === "even") {
+          paint("", "<p class=\"big\">Списывать нечего</p><p>Количество сошлось. Если сумма в акте не ноль, проверьте, ту ли строку смотрите.</p>");
+          return;
+        }
+
+        var shortText = unit === "kg" ? massFromGrams(answer.shortGrams) : piecesWord(answer.short);
+        var zeroPieces = unit === "pcs" && answer.allowance === 0;
+        var capText = unit === "kg" ? massFromGrams(answer.grams) : piecesWord(answer.allowance);
+        var propLabel = zeroPieces ? "12% меньше одной штуки" : ("до " + capText);
+        var ratio = unit === "kg"
+          ? answer.short / answer.allowance
+          : (answer.allowance > 0 ? answer.short / answer.allowance : 1);
+        var qtyMeter = zeroPieces
+          ? ""
+          : meter("Пропорция количества", shortText, capText, ratio);
+        var pctText = fmtPct(answer.pct);
+        var moneyText = fmt(answer.sum, 2) + " ₽";
+        var qtyLine = zeroPieces
+          ? "Недобор " + shortText + " (" + pctText + "%). На это количество 12% меньше одной штуки, целую штуку магазин не закрывает."
+          : (answer.pctOk
+            ? "Недобор " + shortText + " (" + pctText + "%) входит в пропорцию: " + propLabel + "."
+            : "Недобор " + shortText + " (" + pctText + "%) больше пропорции: " + propLabel + ".");
+        var moneyLine = answer.moneyOk
+          ? "Сумма " + moneyText + " входит в 30 ₽."
+          : "Сумма " + moneyText + " больше 30 ₽.";
+        var bars = qtyMeter + meter("Потолок строки", moneyText, "30 ₽", answer.sum / 30);
+
+        if (answer.status === "ok") {
+          var okComment = "Погрешность приёмки. Недобор " + shortText + ", это " + pctText +
+            "%. Пропорция: " + propLabel + ". Сумма " + moneyText + ". Магазин закрывает строку сам.";
+          paint("go", "<p class=\"big\">Магазин закрывает сам</p><p>" + qtyLine + " " + moneyLine + "</p>" + bars, okComment);
+          return;
+        }
+
+        var why = !answer.pctOk && !answer.moneyOk
+          ? "И процент, и сумма выше правила."
+          : (!answer.pctOk ? "Процент выше пропорции." : "Сумма выше 30 ₽.");
+        var stopComment = "Недостача, не погрешность. Недобор " + shortText + ", это " + pctText +
+          "%. Пропорция: " + propLabel + ". Сумма " + moneyText + ".";
+        paint("stop", "<p class=\"big\">Оставляем как недостачу</p><p>" + qtyLine + " " + moneyLine + " " + why + "</p>" + bars, stopComment);
+      }
+
+      function setPressed(group, button) {
+        group.querySelectorAll("button").forEach(function (el) {
+          el.setAttribute("aria-pressed", el === button ? "true" : "false");
+        });
+      }
+
+      document.getElementById("metiz-yes").addEventListener("click", function () {
+        metiz = true;
+        setPressed(this.parentNode, this);
+        recount();
+      });
+      document.getElementById("metiz-no").addEventListener("click", function () {
+        metiz = false;
+        setPressed(this.parentNode, this);
+        recount();
+      });
+      document.getElementById("unit").addEventListener("click", function (event) {
+        var button = event.target.closest("button");
+        if (!button) return;
+        unit = button.getAttribute("data-unit");
+        setPressed(this, button);
+        recount();
+      });
+      [docEl, factEl, sumEl].forEach(function (el) {
+        el.addEventListener("input", recount);
+      });
+      document.querySelectorAll(".chips button").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var parts = btn.getAttribute("data-ex").split("|");
+          unit = parts[0];
+          var unitBtn = document.querySelector('#unit button[data-unit="' + unit + '"]');
+          setPressed(document.getElementById("unit"), unitBtn);
+          docEl.value = parts[1];
+          factEl.value = parts[2];
+          sumEl.value = parts[3];
+          metiz = parts[4] === "1";
+          setPressed(document.getElementById("metiz-yes").parentNode, document.getElementById(metiz ? "metiz-yes" : "metiz-no"));
+          recount();
+        });
+      });
+
+      if (location.hash === "#primer") {
+        document.querySelector(".chips button").click();
+      }
+    })();
+  </script>
+</body>
+</html>
